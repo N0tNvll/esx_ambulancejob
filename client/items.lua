@@ -1,5 +1,4 @@
-RegisterNetEvent('esx_ambulancejob:useItem')
-AddEventHandler('esx_ambulancejob:useItem', function(itemName)
+RegisterNetEvent('esx_ambulancejob:useItem', function(itemName)
   ESX.CloseContext()
 
   if itemName == 'medikit' then

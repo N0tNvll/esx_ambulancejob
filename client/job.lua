@@ -4,8 +4,7 @@ local isBusy, isOnDuty = false, false
 deadPlayers, deadPlayerBlips = {}, {}
 isInShopMenu = false
 
-RegisterNetEvent('esx:playerLoaded')
-AddEventHandler('esx:playerLoaded', function(xPlayer)
+RegisterNetEvent('esx:playerLoaded', function(xPlayer)
 	ESX.PlayerData = xPlayer
 	ESX.PlayerLoaded = true
 end)
@@ -128,20 +127,22 @@ end
 
 function FastTravel(coords, heading)
 	local playerPed = PlayerPedId()
+	
+	if not isDead then
+		DoScreenFadeOut(800)
 
-	DoScreenFadeOut(800)
-
-	while not IsScreenFadedOut() do
-		Wait(500)
-	end
-
-	ESX.Game.Teleport(playerPed, coords, function()
-		DoScreenFadeIn(800)
-
-		if heading then
-			SetEntityHeading(playerPed, heading)
+		while not IsScreenFadedOut() do
+			Wait(500)
 		end
-	end)
+
+		ESX.Game.Teleport(playerPed, coords, function()
+			DoScreenFadeIn(800)
+
+			if heading then
+				SetEntityHeading(playerPed, heading)
+			end
+		end)
+	end
 end
 
 -- Draw markers & Marker logic
@@ -354,8 +355,7 @@ end)
 
 RegisterKeyMapping("ambulance", "Open Ambulance Actions Menu", "keyboard", "F6")
 
-RegisterNetEvent('esx_ambulancejob:putInVehicle')
-AddEventHandler('esx_ambulancejob:putInVehicle', function()
+RegisterNetEvent('esx_ambulancejob:putInVehicle' function()
 	local playerPed = PlayerPedId()
 	local vehicle, distance = ESX.Game.GetClosestVehicle()
 
@@ -451,8 +451,7 @@ function OpenPharmacyMenu()
 	end)
 end
 
-RegisterNetEvent('esx:setJob')
-AddEventHandler('esx:setJob', function(job)
+RegisterNetEvent('esx:setJob', function(job)
 	if isOnDuty and job.name ~= 'ambulance' then
 		for playerId, v in pairs(deadPlayerBlips) do
 			if Config.Debug then

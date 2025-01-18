@@ -89,8 +89,7 @@ RegisterNetEvent('esx_ambulancejob:heal', function(target, type)
 	end
 end)
 
-RegisterNetEvent('esx_ambulancejob:setDeathStatus')
-AddEventHandler('esx_ambulancejob:setDeathStatus', function(isDead)
+RegisterNetEvent('esx_ambulancejob:setDeathStatus', function(isDead)
 	local xPlayer = ESX.GetPlayerFromId(source)
 
 	if type(isDead) == 'boolean' then

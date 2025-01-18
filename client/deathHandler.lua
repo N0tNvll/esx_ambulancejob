@@ -1,43 +1,44 @@
-RegisterNetEvent('esx_ambulancejob:clsearch')
-AddEventHandler('esx_ambulancejob:clsearch', function(medicId)
-  local playerPed = PlayerPedId()
+RegisterNetEvent('esx_ambulancejob:clsearch', function(medicId)
+  	local playerPed = PlayerPedId()
 
-  if isDead then
-    local coords = GetEntityCoords(playerPed)
-    local playersInArea = ESX.Game.GetPlayersInArea(coords, 50.0)
+	if isDead then
+		local coords = GetEntityCoords(playerPed)
+		local playersInArea = ESX.Game.GetPlayersInArea(coords, 50.0)
 
-    for i = 1, #playersInArea, 1 do
-      local player = playersInArea[i]
-      if player == GetPlayerFromServerId(medicId) then
-        medic = tonumber(medicId)
-        isSearched = true
-        break
-      end
-    end
-  end
+		for i = 1, #playersInArea, 1 do
+			local player = playersInArea[i]
+			if player == GetPlayerFromServerId(medicId) then
+				medic = tonumber(medicId)
+				isSearched = true
+				break
+			end
+		end
+	end
 end)
 
-RegisterNetEvent('esx_ambulancejob:revive')
-AddEventHandler('esx_ambulancejob:revive', function()
-  local playerPed = PlayerPedId()
-  local coords = GetEntityCoords(playerPed)
-  TriggerServerEvent('esx_ambulancejob:setDeathStatus', false)
+RegisterNetEvent('esx_ambulancejob:revive', function()
+  	local playerPed = PlayerPedId()
+  	
+	if isDead then
+		local coords = GetEntityCoords(playerPed)
+		TriggerServerEvent('esx_ambulancejob:setDeathStatus', false)
 
-  DoScreenFadeOut(800)
+		DoScreenFadeOut(800)
 
-  while not IsScreenFadedOut() do
-    Wait(50)
-  end
+		while not IsScreenFadedOut() do
+			Wait(50)
+		end
 
-  local formattedCoords = {x = ESX.Math.Round(coords.x, 1), y = ESX.Math.Round(coords.y, 1), z = ESX.Math.Round(coords.z, 1)}
+		local formattedCoords = {x = ESX.Math.Round(coords.x, 1), y = ESX.Math.Round(coords.y, 1), z = ESX.Math.Round(coords.z, 1)}
 
-  RespawnPed(playerPed, formattedCoords, 0.0)
-  isDead = false
-  ClearTimecycleModifier()
-  SetPedMotionBlur(playerPed, false)
-  ClearExtraTimecycleModifier()
-  TriggerEvent('esx_deathscreen:endDeathCam') 
-  DoScreenFadeIn(800)
+		RespawnPed(playerPed, formattedCoords, 0.0)
+		isDead = false
+		ClearTimecycleModifier()
+		SetPedMotionBlur(playerPed, false)
+		ClearExtraTimecycleModifier()
+		TriggerEvent('esx_deathscreen:endDeathCam') 
+		DoScreenFadeIn(800)
+	end
 end)
 
 function revivePlayer(closestPlayer)
@@ -73,37 +74,36 @@ function revivePlayer(closestPlayer)
 	end, 'medikit')
 end
 
-RegisterNetEvent('esx_ambulancejob:heal')
-AddEventHandler('esx_ambulancejob:heal', function(healType, quiet)
+RegisterNetEvent('esx_ambulancejob:heal', function(healType, quiet)
 	local playerPed = PlayerPedId()
 	local maxHealth = GetEntityMaxHealth(playerPed)
 
-	if healType == 'small' then
-		local health = GetEntityHealth(playerPed)
-		local newHealth = math.min(maxHealth, math.floor(health + maxHealth / 8))
-		SetEntityHealth(playerPed, newHealth)
-	elseif healType == 'big' then
-		SetEntityHealth(playerPed, maxHealth)
-	end
+	if not isDead then
+		if healType == 'small' then
+			local health = GetEntityHealth(playerPed)
+			local newHealth = math.min(maxHealth, math.floor(health + maxHealth / 8))
+			SetEntityHealth(playerPed, newHealth)
+		elseif healType == 'big' then
+			SetEntityHealth(playerPed, maxHealth)
+		end
 
-	if Config.Debug then
-		print("[^2INFO^7] Healing Player - ^5" .. tostring(healType) .. "^7")
-	end
-	if not quiet then
-		ESX.ShowNotification(TranslateCap('healed'))
+		if Config.Debug then
+			print("[^2INFO^7] Healing Player - ^5" .. tostring(healType) .. "^7")
+		end
+		if not quiet then
+			ESX.ShowNotification(TranslateCap('healed'))
+		end
 	end
 end)
 
-RegisterNetEvent('esx_ambulancejob:PlayerDead')
-AddEventHandler('esx_ambulancejob:PlayerDead', function(Player)
+RegisterNetEvent('esx_ambulancejob:PlayerDead', function(Player)
 	if Config.Debug then
 		print("[^2INFO^7] Player Dead | ^5" .. tostring(Player) .. "^7")
 	end
 	deadPlayers[Player] = "dead"
 end)
 
-RegisterNetEvent('esx_ambulancejob:PlayerNotDead')
-AddEventHandler('esx_ambulancejob:PlayerNotDead', function(Player)
+RegisterNetEvent('esx_ambulancejob:PlayerNotDead', function(Player)
 	if deadPlayerBlips[Player] then
 		RemoveBlip(deadPlayerBlips[Player])
 		deadPlayerBlips[Player] = nil
@@ -114,8 +114,7 @@ AddEventHandler('esx_ambulancejob:PlayerNotDead', function(Player)
 	deadPlayers[Player] = nil
 end)
 
-RegisterNetEvent('esx_ambulancejob:setDeadPlayers')
-AddEventHandler('esx_ambulancejob:setDeadPlayers', function(_deadPlayers)
+RegisterNetEvent('esx_ambulancejob:setDeadPlayers', function(_deadPlayers)
 	deadPlayers = _deadPlayers
 
 	if isOnDuty then
@@ -151,8 +150,7 @@ AddEventHandler('esx_ambulancejob:setDeadPlayers', function(_deadPlayers)
 	end
 end)
 
-RegisterNetEvent('esx_ambulancejob:PlayerDistressed')
-AddEventHandler('esx_ambulancejob:PlayerDistressed', function(playerId, playerCoords)
+RegisterNetEvent('esx_ambulancejob:PlayerDistressed', function(playerId, playerCoords)
 	deadPlayers[playerId] = 'distress'
 
 	if isOnDuty then

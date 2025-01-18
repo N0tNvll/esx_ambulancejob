@@ -1,4 +1,4 @@
-Config                            = {}
+Config = {}
 
 Config.DrawDistance               = 10.0 -- How close do you need to be in order for the markers to be drawn (in GTA units).
 Config.Debug                      = true
